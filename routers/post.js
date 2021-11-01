@@ -2,6 +2,8 @@ const express = require('express')
 const Post = require('../models/post')
 const auth = require('../middleware/auth')
 const User = require('../models/user')
+const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId;
 const router = new express.Router()
 
 router.post('/posts', auth, async (req, res) => {
@@ -59,6 +61,22 @@ router.get('/posts', auth, async (req, res) =>{
 
 
     } catch (e){
+        console.log(e)
+        res.status(500).send()
+    }
+})
+
+router.post('/visitposts', auth, async (req, res) => {
+    try{
+        const search_id = req.body.search_id;
+        console.log(search_id)
+        const ls = await Post.aggregate([
+            {$match:{owner:ObjectId(search_id)}},
+            {$sort:{createdAt:-1}}
+        ])
+        console.log(ls)
+        res.send(ls)
+    } catch(e){
         console.log(e)
         res.status(500).send()
     }
