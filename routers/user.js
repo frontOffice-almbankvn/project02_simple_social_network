@@ -34,15 +34,13 @@ router.post('/users/login', async (req, res) =>{
 
 router.post('/users/follow', auth, async (req, res) =>{
     try{
-        // console.log(req.user)
 
         if (!req.user.followPeople){
             req.user.followPeople = []
         }
 
-        // console.log(req.body.followPeople_id)
         let m = req.user.followPeople.filter(x => {
-            // console.log(x.toString(), req.body.followPeople_id,x.toString() === req.body.followPeople_id )    
+
             return x.toString() === req.body.followPeople_id
             }
         )
@@ -70,12 +68,11 @@ router.post('/users/unfollow', auth, async (req, res) => {
             return !x.toString() === req.body.followPeople_id
             }
         )
-            // x != req.body.followPeople_id
+
         req.user.followPeople = m
         await req.user.save()
         res.send(req.user.followPeople)
-        // console.log(req.user.followPeople)
-        // //console.log(req.user.followPeople)
+
         
     } catch(e){
         console.log(e)
@@ -112,17 +109,6 @@ router.get('/users/me', auth, async (req, res) => {
     res.send(req.user)
 })
 
-// router.post('/following', auth, async (req, res) => {
-//     try {
-//         req.user.followPeople.concat(req.body._id)
-//         await req.user.save()
-//         console.log(req.user.followPeople)
-//         res.send()
-//     } catch (e) {
-//         console.log(e)
-//         res.status(500).send()
-//     }
-// } )
 
 router.post('/follows', auth, async (req, res) => {
     // console.log("get follows",req.body.text )

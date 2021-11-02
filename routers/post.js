@@ -74,7 +74,7 @@ router.post('/visitposts', auth, async (req, res) => {
             {$match:{owner:ObjectId(search_id)}},
             {$sort:{createdAt:-1}}
         ])
-        console.log(ls)
+        // console.log(ls)
         res.send(ls)
     } catch(e){
         console.log(e)
@@ -82,6 +82,29 @@ router.post('/visitposts', auth, async (req, res) => {
     }
 })
 
+router.get('/relatedposts', auth, async (req, res) => {
+    try {
+        // console.log(req.user._id)
+        const ls = await Post.aggregate(
+            [
+                {$match:{
+                        $expr:{
+                            $or:
+                            [
+                                {$in:["$owner",req.user.followPeople.concat(req.user._id) ]}
+                            ]
+                        }
+                    }
+                },
+                {$sort:{createdAt:-1}}
+            ]
+        )
+        res.send(ls)
+    } catch(e){
+        console.log(e)
+        res.status(500).send()
+    }
+})
 
 router.delete('/posts/:id', auth, async (req,res) => {
     try{
