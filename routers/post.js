@@ -96,7 +96,43 @@ router.get('/relatedposts', auth, async (req, res) => {
                         }
                     }
                 },
-                {$sort:{createdAt:-1}}
+                
+                {$lookup:{
+                        from:"users",
+                        let:{ownerid:"$owner"},
+                        pipeline:[
+                            {
+                                $match:
+                                {
+                                    $expr:{
+                                        $eq:["$_id","$$ownerid"]
+                                    }
+                                }
+                            },
+                            {
+                                $project:{
+                                    _id:0,
+                                    email:1
+                                }
+                            }
+                        ],
+                        as:"writers"
+                    }
+                },
+                {
+                    $replaceRoot:{
+                        newRoot:{
+                            $mergeObjects:[{$arrayElemAt:["$writers",0]},"$$ROOT"]
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        writers:0
+                    }
+                }
+                ,
+                {$sort:{createdAt:-1}},
             ]
         )
         res.send(ls)
